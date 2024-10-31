@@ -1,87 +1,165 @@
+/* Base Styles */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
 }
 
 body {
     min-height: 100vh;
-    background: linear-gradient(45deg, #0f2027, #203a43, #2c5364);
+    background: linear-gradient(125deg, #000428 0%, #004e92 100%);
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Background Animation */
+body::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.05) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.05) 50%,
+        rgba(255, 255, 255, 0.05) 75%,
+        transparent 75%,
+        transparent
+    );
+    background-size: 60px 60px;
+    animation: backgroundMove 15s linear infinite;
+    opacity: 0.3;
+}
+
+@keyframes backgroundMove {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 .calculator {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    padding: 30px;
-    border-radius: 20px;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(20, 20, 35, 0.8);
+    backdrop-filter: blur(20px);
+    padding: 35px;
+    border-radius: 30px;
+    box-shadow: 
+        0 20px 50px rgba(0, 0, 0, 0.5),
+        0 1px 2px rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     width: 100%;
     max-width: 420px;
-    animation: fadeIn 0.5s ease-out;
+    animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+/* Glossy Effect */
+.calculator::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.05) 15%,
+        transparent 50%
+    );
+    border-radius: 30px;
+    pointer-events: none;
 }
 
 .display {
-    background: rgba(0, 0, 0, 0.3);
-    padding: 25px;
-    border-radius: 15px;
-    margin-bottom: 25px;
+    background: rgba(10, 10, 20, 0.8);
+    padding: 30px;
+    border-radius: 20px;
+    margin-bottom: 30px;
     text-align: right;
-    min-height: 120px;
+    min-height: 140px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 
+        inset 0 2px 10px rgba(0, 0, 0, 0.5),
+        0 1px 1px rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Display Glow Effect */
+.display::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.1) 0%,
+        transparent 70%
+    );
+    animation: glowMove 10s linear infinite;
+}
+
+@keyframes glowMove {
+    0% { transform: translate(-30%, -30%) rotate(0deg); }
+    100% { transform: translate(-30%, -30%) rotate(360deg); }
 }
 
 #result {
-    font-size: 2.5em;
+    font-size: 3em;
     color: #ffffff;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-    margin-bottom: 5px;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+    margin-bottom: 10px;
     word-wrap: break-word;
     font-weight: 300;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
 }
 
 #expression {
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 1em;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.1em;
     min-height: 1.2em;
     margin-bottom: 10px;
+    font-weight: 300;
+    letter-spacing: 0.5px;
 }
 
 .buttons {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
+    gap: 15px;
 }
 
 button {
-    padding: 18px;
-    font-size: 1.2em;
+    padding: 20px;
+    font-size: 1.3em;
     border: none;
-    border-radius: 12px;
+    border-radius: 16px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     color: white;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     font-weight: 500;
     position: relative;
     overflow: hidden;
+    letter-spacing: 0.5px;
 }
 
+/* Button Hover Effects */
 button::before {
     content: '';
     position: absolute;
@@ -92,10 +170,15 @@ button::before {
     background: linear-gradient(
         120deg,
         transparent,
-        rgba(255, 255, 255, 0.2),
+        rgba(255, 255, 255, 0.3),
         transparent
     );
-    transition: 0.5s;
+    transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 button:hover::before {
@@ -103,69 +186,123 @@ button:hover::before {
 }
 
 button:active {
-    transform: scale(0.95);
+    transform: scale(0.95) translateY(0);
 }
 
 .number {
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    background: linear-gradient(145deg, 
+        rgba(255, 255, 255, 0.15),
+        rgba(255, 255, 255, 0.05)
+    );
 }
 
 .operator {
-    background: linear-gradient(145deg, #2196f3, #1976d2);
+    background: linear-gradient(145deg, 
+        rgba(33, 150, 243, 0.8),
+        rgba(25, 118, 210, 0.8)
+    );
     font-weight: bold;
 }
 
 .function {
-    background: linear-gradient(145deg, #424242, #323232);
+    background: linear-gradient(145deg,
+        rgba(66, 66, 66, 0.8),
+        rgba(50, 50, 50, 0.8)
+    );
 }
 
 .equals {
-    background: linear-gradient(145deg, #4caf50, #388e3c);
+    background: linear-gradient(145deg,
+        rgba(76, 175, 80, 0.8),
+        rgba(56, 142, 60, 0.8)
+    );
     font-weight: bold;
 }
 
 .clear {
-    background: linear-gradient(145deg, #f44336, #d32f2f);
+    background: linear-gradient(145deg,
+        rgba(244, 67, 54, 0.8),
+        rgba(211, 47, 47, 0.8)
+    );
 }
 
 .memory {
-    background: linear-gradient(145deg, #ff9800, #f57c00);
+    background: linear-gradient(145deg,
+        rgba(255, 152, 0, 0.8),
+        rgba(245, 124, 0, 0.8)
+    );
 }
 
-.theme-toggle {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 10px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: 0.3s;
+/* Custom Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
-/* カスタムスクロールバー */
+@keyframes buttonPress {
+    0% { transform: scale(1); }
+    40% { transform: scale(0.92); }
+    100% { transform: scale(1); }
+}
+
+.button-press {
+    animation: buttonPress 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Result Animation */
+.result-update {
+    animation: updateValue 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes updateValue {
+    0% { transform: scale(1.1) translateY(-5px); opacity: 0; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .calculator {
+        padding: 25px;
+    }
+    
+    .display {
+        padding: 20px;
+        min-height: 120px;
+    }
+    
+    #result {
+        font-size: 2.5em;
+    }
+    
+    button {
+        padding: 15px;
+        font-size: 1.2em;
+    }
+}
+
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.2);
     border-radius: 4px;
+    transition: all 0.3s ease;
 }
 
-/* アニメーション */
-@keyframes buttonPress {
-    0% { transform: scale(1); }
-    50% { transform: scale(0.95); }
-    100% { transform: scale(1); }
-}
-
-.button-press {
-    animation: buttonPress 0.2s ease-out;
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
