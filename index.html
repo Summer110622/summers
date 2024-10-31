@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Engineering Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(45deg, #0f2027, #203a43, #2c5364);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .calculator {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            width: 100%;
+            max-width: 420px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .display {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            text-align: right;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        #result {
+            font-size: 2.5em;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            margin-bottom: 5px;
+            word-wrap: break-word;
+            font-weight: 300;
+        }
+
+        #expression {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1em;
+            min-height: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        button {
+            padding: 18px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                120deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .number {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+        }
+
+        .operator {
+            background: linear-gradient(145deg, #2196f3, #1976d2);
+            font-weight: bold;
+        }
+
+        .function {
+            background: linear-gradient(145deg, #424242, #323232);
+        }
+
+        .equals {
+            background: linear-gradient(145deg, #4caf50, #388e3c);
+            font-weight: bold;
+        }
+
+        .clear {
+            background: linear-gradient(145deg, #f44336, #d32f2f);
+        }
+
+        .memory {
+            background: linear-gradient(145deg, #ff9800, #f57c00);
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        /* カスタムスクロールバー */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        /* アニメーション */
+        @keyframes buttonPress {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.95); }
+            100% { transform: scale(1); }
+        }
+
+        .button-press {
+            animation: buttonPress 0.2s ease-out;
+        }
+
+        /* 計算履歴パネル */
+        .history-panel {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 15px;
+            max-width: 200px;
+            display: none;
+        }
+
+        .history-panel.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display">
+            <div id="expression"></div>
+            <div id="result">0</div>
+        </div>
+        <div class="buttons">
+            <button class="memory" onclick="memoryStore()" title="Memory Store">MS</button>
+            <button class="memory" onclick="memoryRecall()" title="Memory Recall">MR</button>
+            <button class="memory" onclick="memoryPlus()" title="Memory Add">M+</button>
+            <button class="memory" onclick="memoryClear()" title="Memory Clear">MC</button>
+            
+            <button class="function" onclick="addToExpression('(')">(</button>
+            <button class="function" onclick="addToExpression(')')">)</button>
+            <button class="function" onclick="calculate('sqrt')" title="Square Root">√</button>
+            <button class="function" onclick="calculate('pow')" title="Square">x²</button>
+            
+            <button class="number" onclick="addToExpression('7')">7</button>
+            <button class="number" onclick="addToExpression('8')">8</button>
+            <button class="number" onclick="addToExpression('9')">9</button>
+            <button class="operator" onclick="addToExpression('/')">/</button>
+            
+            <button class="number" onclick="addToExpression('4')">4</button>
+            <button class="number" onclick="addToExpression('5')">5</button>
+            <button class="number" onclick="addToExpression('6')">6</button>
+            <button class="operator" onclick="addToExpression('*')">×</button>
+            
+            <button class="number" onclick="addToExpression('1')">1</button>
+            <button class="number" onclick="addToExpression('2')">2</button>
+            <button class="number" onclick="addToExpression('3')">3</button>
+            <button class="operator" onclick="addToExpression('-')">-</button>
+            
+            <button class="number" onclick="addToExpression('0')">0</button>
+            <button class="number" onclick="addToExpression('.')">.</button>
+            <button class="equals" onclick="calculateResult()">=</button>
+            <button class="operator" onclick="addToExpression('+')">+</button>
+            
+            <button class="clear" onclick="clearAll()">C</button>
+            <button class="clear" onclick="clearEntry()">CE</button>
+            <button class="function" onclick="backspace()">←</button>
+            <button class="function" onclick="toggleSign()">±</button>
+        </div>
+    </div>
+
+    <script>
+        let currentExpression = '';
+        let memory = 0;
+        let lastResult = 0;
+        let calculationHistory = [];
+
+        // ボタンプレスエフェクト
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', function() {
+                this.classList.add('button-press');
+                setTimeout(() => {
+                    this.classList.remove('button-press');
+                }, 200);
+            });
+        });
+
+        function updateDisplay() {
+            const resultElement = document.getElementById('result');
+            const expressionElement = document.getElementById('expression');
+            
+            // アニメーション付きの更新
+            resultElement.style.opacity = '0';
+            setTimeout(() => {
+                resultElement.textContent = lastResult;
+                resultElement.style.opacity = '1';
+            }, 100);
+
+            expressionElement.textContent = currentExpression;
+        }
+
+        function addToExpression(value) {
+            currentExpression += value;
+            updateDisplay();
+        }
+
+        function clearAll() {
+            currentExpression = '';
+            lastResult = 0;
+            updateDisplay();
+        }
+
+        function clearEntry() {
+            currentExpression = '';
+            updateDisplay();
+        }
+
+        function backspace() {
+            currentExpression = currentExpression.slice(0, -1);
+            updateDisplay();
+        }
+
+        function toggleSign() {
+            if (lastResult !== 0) {
+                lastResult = -lastResult;
+                currentExpression = lastResult.toString();
+                updateDisplay();
+            }
+        }
+
+        function memoryStore() {
+            memory = lastResult;
+            showNotification('Memory Stored');
+        }
+
+        function memoryRecall() {
+            currentExpression += memory.toString();
+            updateDisplay();
+        }
+
+        function memoryPlus() {
+            memory += lastResult;
+            showNotification('Added to Memory');
+        }
+
+        function memoryClear() {
+            memory = 0;
+            showNotification('Memory Cleared');
+        }
+
+        function calculate(operation) {
+            switch(operation) {
+                case 'sqrt':
+                    if (lastResult >= 0) {
+                        lastResult = Math.sqrt(lastResult);
+                        currentExpression = `√(${currentExpression})`;
+                    }
+                    break;
+                case 'pow':
+                    lastResult = Math.pow(lastResult, 2);
+                    currentExpression = `(${currentExpression})²`;
+                    break;
+            }
+            updateDisplay();
+        }
+
+        function calculateResult() {
+            try {
+                const originalExpression = currentExpression;
+                const calculateFn = new Function('return ' + currentExpression);
+                lastResult = calculateFn();
+                
+                if (isNaN(lastResult) || !isFinite(lastResult)) {
+                    throw new Error('Invalid calculation');
+                }
+                
+                lastResult = parseFloat(lastResult.toFixed(8));
+                calculationHistory.push({
+                    expression: originalExpression,
+                    result: lastResult
+                });
+                
+                currentExpression = lastResult.toString();
+                
+                // アニメーション付きの結果表示
+                const resultElement = document.getElementById('result');
+                resultElement.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    resultElement.style.transform = 'scale(1)';
+                }, 200);
+            } catch (error) {
+                lastResult = 'Error';
+                currentExpression = '';
+                showNotification('Invalid Expression', 'error');
+            }
+            updateDisplay();
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.position = 'fixed';
+            notification.style.bottom = '20px';
+            notification.style.left = '50%';
+            notification.style.transform = 'translateX(-50%)';
+            notification.style.padding = '10px 20px';
+            notification.style.borderRadius = '5px';
+            notification.style.background = type === 'error' ? '#f44336' : '#4caf50';
+            notification.style.color = 'white';
+            notification.style.zIndex = '1000';
+            notification.style.animation = 'fadeInOut 2s ease-in-out';
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 2000);
+        }
+
+        // キーボードサポート
+        document.addEventListener('keydown', function(event) {
+            const key = event.key;
+            
+            if (/[0-9.]/.test(key)) {
+                addToExpression(key);
+                animateButton(key);
+            } else if (['+', '-', '*', '/'].includes(key)) {
+                addToExpression(key);
+                animateButton(key);
+            } else if (key === 'Enter') {
+                calculateResult();
+                animateButton('=');
+            } else if (key === 'Backspace') {
+                backspace();
+                animateButton('←');
+            } else if (key === 'Escape') {
+                clearAll();
+                animateButton('C');
+            }
+        });
+
+        function animateButton(value) {
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                if (button.textContent === value) {
+                    button.classList.add('button-press');
+                    setTimeout(() => {
+                        button.classList.remove('button-press');
+                    }, 200);
+                }
+            });
+        }
+
+        // カスタムスタイル適用
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初期アニメーション
+            document.querySelector('.calculator').style.opacity = '0';
+            setTimeout(() => {
+                document.querySelector('.calculator').style.opacity = '1';
+            }, 100);
+        });
+    </script>
+</body>
+</html>
